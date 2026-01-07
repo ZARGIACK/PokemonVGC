@@ -1,0 +1,1863 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Pokémon Team Builder</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: white;
+            min-height: 100vh;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 220px;
+            background: rgba(0, 0, 0, 0.9);
+            padding: 20px;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            border-right: 3px solid crimson;
+            box-shadow: 5px 0 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .logo {
+            color: #ffd84d;
+            margin-bottom: 30px;
+            font-size: 28px;
+            text-align: center;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(255, 216, 77, 0.5);
+        }
+
+        .sidebar a {
+            display: block;
+            padding: 14px;
+            color: #ffd84d;
+            text-decoration: none;
+            margin-bottom: 12px;
+            border-radius: 10px;
+            background: rgba(255, 216, 77, 0.1);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 216, 77, 0.2);
+            font-weight: bold;
+        }
+
+        .sidebar a:hover {
+            background: rgba(255, 216, 77, 0.2);
+            transform: translateX(8px);
+            box-shadow: 0 5px 15px rgba(255, 216, 77, 0.2);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 220px;
+            padding: 25px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, crimson 0%, #a50000 100%);
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 8px 25px rgba(220, 20, 60, 0.4);
+            border: 3px solid #ffd84d;
+        }
+
+        .header h1 {
+            font-size: 32px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Team Slots - Enhanced */
+        .team-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .team-slot {
+            background: linear-gradient(145deg, #2a2a3a, #1f1f2e);
+            border: 3px solid #444;
+            border-radius: 20px;
+            padding: 25px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .team-slot:hover {
+            border-color: #ffd84d;
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 15px 35px rgba(255, 216, 77, 0.3);
+        }
+
+        .team-slot.empty {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #888;
+            font-size: 20px;
+            min-height: 400px;
+            background: rgba(42, 42, 58, 0.5);
+        }
+
+        .team-slot.empty .add-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            color: #ffd84d;
+            text-shadow: 0 0 20px rgba(255, 216, 77, 0.5);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        /* Pokémon Card - Enhanced */
+        .pokemon-card {
+            position: relative;
+        }
+
+        .pokemon-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #444;
+        }
+
+        .pokemon-name {
+            font-size: 24px;
+            font-weight: bold;
+            color: #ffd84d;
+            text-shadow: 0 0 10px rgba(255, 216, 77, 0.3);
+        }
+
+        .pokemon-level {
+            background: crimson;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .pokemon-info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .pokemon-image {
+            text-align: center;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 15px;
+            border: 2px solid #444;
+        }
+
+        .pokemon-image img {
+            width: 150px;
+            height: 150px;
+            image-rendering: pixelated;
+            filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.2));
+        }
+
+        .pokemon-details {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .detail-section {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #ffd84d;
+        }
+
+        .detail-section h3 {
+            color: #ffd84d;
+            margin-bottom: 10px;
+            font-size: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .edit-btn {
+            background: #444;
+            color: white;
+            border: none;
+            padding: 3px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+
+        .edit-btn:hover {
+            background: #555;
+        }
+
+        .types-container {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .type-badge {
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: bold;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s;
+        }
+
+        .type-badge:hover {
+            transform: scale(1.1);
+        }
+
+        .ability-select, .item-select, .move-select {
+            width: 100%;
+            padding: 8px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid #555;
+            margin-top: 5px;
+        }
+
+        .moves-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .move-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 10px;
+            border-radius: 8px;
+            border-left: 3px solid #ffd84d;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .move-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(5px);
+        }
+
+        .remove-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: crimson;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            cursor: pointer;
+            font-size: 20px;
+            font-weight: bold;
+            transition: all 0.3s;
+            z-index: 10;
+        }
+
+        .remove-btn:hover {
+            background: #ff3333;
+            transform: rotate(90deg) scale(1.1);
+            box-shadow: 0 0 15px rgba(255, 51, 51, 0.5);
+        }
+
+        /* Search Section */
+        .search-section {
+            background: linear-gradient(135deg, #2a2a3a 0%, #1f1f2e 100%);
+            padding: 30px;
+            border-radius: 20px;
+            margin-bottom: 40px;
+            border: 2px solid #444;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .search-box {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .search-box input {
+            flex: 1;
+            padding: 15px;
+            border-radius: 12px;
+            border: 2px solid #444;
+            background: rgba(0, 0, 0, 0.3);
+            color: white;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: #ffd84d;
+            box-shadow: 0 0 20px rgba(255, 216, 77, 0.3);
+        }
+
+        .search-box button {
+            padding: 15px 40px;
+            background: linear-gradient(135deg, #ffd84d 0%, #ff9900 100%);
+            color: #000;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(255, 216, 77, 0.3);
+        }
+
+        .search-box button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255, 216, 77, 0.5);
+        }
+
+        .search-results {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 20px;
+            max-height: 500px;
+            overflow-y: auto;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+            border: 1px solid #444;
+        }
+
+        .search-result-item {
+            background: linear-gradient(135deg, #333344 0%, #222233 100%);
+            padding: 20px;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+            text-align: center;
+        }
+
+        .search-result-item:hover {
+            transform: translateY(-8px) scale(1.05);
+            border-color: #ffd84d;
+            box-shadow: 0 15px 30px rgba(255, 216, 77, 0.3);
+        }
+
+        /* Team Stats */
+        .team-stats {
+            background: linear-gradient(135deg, #2a2a3a 0%, #1f1f2e 100%);
+            padding: 30px;
+            border-radius: 20px;
+            margin-top: 30px;
+            border: 2px solid #444;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .team-stats h2 {
+            color: #ffd84d;
+            margin-bottom: 25px;
+            font-size: 28px;
+            text-align: center;
+            text-shadow: 0 0 10px rgba(255, 216, 77, 0.3);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-item {
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.4), rgba(68, 68, 68, 0.2));
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            border: 2px solid #444;
+            transition: all 0.3s;
+        }
+
+        .stat-item:hover {
+            border-color: #ffd84d;
+            transform: translateY(-5px);
+        }
+
+        .stat-name {
+            color: #aaa;
+            font-size: 14px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #ffd84d;
+            text-shadow: 0 0 10px rgba(255, 216, 77, 0.3);
+        }
+
+        /* Type Coverage */
+        .type-coverage {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 25px;
+            border-radius: 15px;
+            margin-top: 20px;
+        }
+
+        .type-coverage h3 {
+            color: #ffd84d;
+            margin-bottom: 20px;
+            font-size: 22px;
+        }
+
+        .type-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .type-coverage-item {
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: bold;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .type-coverage-item:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Modal for editing */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #2a2a3a 0%, #1f1f2e 100%);
+            margin: 50px auto;
+            padding: 30px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+            border: 3px solid #ffd84d;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        .close-modal {
+            color: #ffd84d;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .close-modal:hover {
+            color: white;
+            transform: rotate(90deg);
+        }
+
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 2000;
+        }
+
+        .toast {
+            background: linear-gradient(135deg, #2a2a3a 0%, #1f1f2e 100%);
+            color: white;
+            padding: 15px 20px;
+            margin-bottom: 10px;
+            border-radius: 10px;
+            border-left: 5px solid #ffd84d;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4);
+            animation: slideInRight 0.3s ease-out;
+            min-width: 300px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .toast.success {
+            border-left-color: #4CAF50;
+            background: linear-gradient(135deg, #1e3a1f 0%, #2d5f33 100%);
+        }
+
+        .toast.error {
+            border-left-color: #f44336;
+            background: linear-gradient(135deg, #3a1e1e 0%, #5f2d2d 100%);
+        }
+
+        .toast.warning {
+            border-left-color: #ff9800;
+            background: linear-gradient(135deg, #3a2a1e 0%, #5f4d2d 100%);
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOutRight {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+        }
+
+        .toast.removing {
+            animation: slideOutRight 0.3s ease-out forwards;
+        }
+
+        /* EV/IV Editor */
+        .stat-editor {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #ffd84d;
+            margin-bottom: 20px;
+        }
+
+        .stat-editor h3 {
+            color: #ffd84d;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .stat-input-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-input-group label {
+            font-size: 12px;
+            color: #aaa;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .stat-input-group input {
+            padding: 8px;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid #555;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .stat-input-group input:focus {
+            outline: none;
+            border-color: #ffd84d;
+            box-shadow: 0 0 10px rgba(255, 216, 77, 0.3);
+        }
+
+        .ev-tracker {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+
+        .ev-tracker-bar {
+            width: 100%;
+            height: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+
+        .ev-tracker-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4CAF50, #ffd84d);
+            transition: width 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: black;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .ev-tracker-fill.warning {
+            background: linear-gradient(90deg, #ff9800, #f44336);
+        }
+
+        .ev-tracker-text {
+            text-align: center;
+            font-size: 12px;
+            color: #ffd84d;
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .team-container {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 0;
+                padding: 0;
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .pokemon-info-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+          <h2 class="logo">Menu</h2>
+          <a href="homepage.html">Dashboard</a>
+          <a href="pokedex.html">Pokédex Browser</a>
+          <a href="dmgCalcWeb.html">Damage Calculator</a>
+          <a href="map.html">Map Viewer</a>
+          <a href="gymTracker.html">Gym Tracker</a>
+          <a href="team-builder.html">Team Builder</a>
+          <a href="admin.html">Admin</a>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="header">
+                <h1>Pokémon Team Builder</h1>
+                <div class="team-actions">
+                    <button onclick="saveTeam()" style="padding: 12px 25px; background: linear-gradient(135deg, #ffd84d 0%, #ff9900 100%); color: black; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; margin-right: 10px; box-shadow: 0 5px 15px rgba(255, 216, 77, 0.3);">
+                        💾 Save Team
+                    </button>
+                    <button onclick="clearTeam()" style="padding: 12px 25px; background: linear-gradient(135deg, #666 0%, #444 100%); color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);">
+                        🗑️ Clear Team
+                    </button>
+                </div>
+            </header>
+
+            <!-- Team Slots -->
+            <div class="team-container" id="teamContainer">
+                <!-- Team slots will be generated here -->
+            </div>
+
+            <!-- Search Section -->
+            <section class="search-section">
+                <div class="search-box">
+                    <input type="text" id="pokemonSearch" placeholder="Search Pokémon by name or type..." autocomplete="off">
+                    <button onclick="searchPokemon()">🔍 Search Pokémon</button>
+                </div>
+                <div class="search-results" id="searchResults">
+                    <div style="color: #888; text-align: center; padding: 30px; grid-column: 1 / -1;">
+                        Search for Pokémon to add to your team. Click on any Pokémon to add it.
+                    </div>
+                </div>
+            </section>
+
+            <!-- Team Stats -->
+            <section class="team-stats">
+                <h2>📊 Team Statistics</h2>
+                <div class="stats-grid" id="teamStats">
+                    <!-- Stats will be calculated here -->
+                </div>
+                <div class="type-coverage">
+                    <h3>🛡️ Type Coverage</h3>
+                    <div class="type-grid" id="typeCoverage">
+                        <!-- Type coverage will be calculated here -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Saved Teams -->
+            <section class="team-stats">
+                <h2>💾 Saved Teams</h2>
+                <div id="savedTeamsList" style="min-height: 100px;">
+                    <div style="color: #aaa; text-align: center; padding: 30px;">Loading teams...</div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Modal for editing Pokémon details -->
+        <div id="editModal" class="modal">
+            <div class="modal-content">
+                <span class="close-modal" onclick="closeModal()">&times;</span>
+                <div id="modalContent">
+                    <!-- Modal content will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script>
+        // Enhanced Pokémon class
+        class TeamPokemon {
+            constructor(pokemonData) {
+                this.id = pokemonData.id;
+                this.name = pokemonData.name;
+                this.types = pokemonData.types || [];
+                this.abilities = pokemonData.abilities || [];
+                this.moves = pokemonData.moves || [];
+                this.stats = pokemonData.stats || {};
+                this.level = 50;
+                this.ability = pokemonData.abilities?.[0] || '';
+                this.item = '';
+                this.selectedMoves = ['', '', '', ''];
+                this.evs = { hp: 0, attack: 0, defence: 0, sp_atk: 0, sp_def: 0, spd: 0 };
+                this.ivs = { hp: 31, attack: 31, defence: 31, sp_atk: 31, sp_def: 31, spd: 31 };
+                this.nature = 'Hardy';
+            }
+        }
+
+        let currentTeam = Array(6).fill(null);
+        let allPokemon = [];
+        let searchResults = [];
+        let currentEditSlot = null;
+        let targetSlotForAdd = null; // slot chosen before searching
+
+        // Toast Notification System
+        function showToast(message, type = 'info', duration = 3000) {
+            // Create container if it doesn't exist
+            let container = document.getElementById('toastContainer');
+            if (!container) {
+                container = document.createElement('div');
+                container.id = 'toastContainer';
+                container.className = 'toast-container';
+                document.body.appendChild(container);
+            }
+
+            // Create toast element
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            
+            let icon = '✓';
+            if (type === 'error') icon = '✕';
+            else if (type === 'warning') icon = '⚠';
+            
+            toast.innerHTML = `<span>${icon}</span><span>${message}</span>`;
+            container.appendChild(toast);
+
+            // Auto remove after duration
+            setTimeout(() => {
+                toast.classList.add('removing');
+                setTimeout(() => toast.remove(), 300);
+            }, duration);
+        }
+
+        // Predefined items and natures
+        const commonItems = [
+            'Leftovers', 'Choice Band', 'Choice Specs', 'Choice Scarf',
+            'Life Orb', 'Assault Vest', 'Focus Sash', 'Black Sludge',
+            'Heavy-Duty Boots', 'Rocky Helmet', 'Air Balloon', 'Eject Button',
+            'Sitrus Berry', 'Lum Berry', 'Weakness Policy', 'Iron Ball'
+        ];
+
+        const natures = [
+            'Hardy', 'Lonely', 'Brave', 'Adamant', 'Naughty',
+            'Bold', 'Docile', 'Relaxed', 'Impish', 'Lax',
+            'Timid', 'Hasty', 'Serious', 'Jolly', 'Naive',
+            'Modest', 'Mild', 'Quiet', 'Bashful', 'Rash',
+            'Calm', 'Gentle', 'Sassy', 'Careful', 'Quirky'
+        ];
+
+        // Initialize team slots
+        function initTeamSlots() {
+            const teamContainer = document.getElementById('teamContainer');
+            teamContainer.innerHTML = '';
+
+            currentTeam.forEach((pokemon, index) => {
+                const slot = document.createElement('div');
+                slot.className = 'team-slot';
+                slot.dataset.index = index;
+
+                if (pokemon) {
+                    slot.classList.remove('empty');
+                    slot.innerHTML = createPokemonCardHTML(pokemon, index);
+                } else {
+                    slot.classList.add('empty');
+                    slot.innerHTML = `
+                        <div class="add-icon">+</div>
+                        <div>Add Pokémon Slot ${index + 1}</div>
+                    `;
+                    slot.onclick = () => openPokemonSelector(index);
+                }
+
+                teamContainer.appendChild(slot);
+            });
+
+            updateTeamStats();
+        }
+
+        // Create enhanced Pokémon card HTML
+        function createPokemonCardHTML(pokemon, index) {
+            return `
+                <div class="pokemon-card">
+                    <button class="remove-btn" onclick="removeFromTeam(${index})" title="Remove Pokémon">×</button>
+
+                    <div class="pokemon-header">
+                        <div class="pokemon-name">${pokemon.name}</div>
+                        <div class="pokemon-level">Lv. ${pokemon.level}</div>
+                    </div>
+
+                    <div class="pokemon-info-grid">
+                        <div class="pokemon-image">
+                            <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pokemon.id}.png"
+                                 alt="${pokemon.name}"
+                                 onerror="this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/0.png'">
+                        </div>
+
+                        <div class="pokemon-details">
+                            <div class="detail-section">
+                                <h3>Type ${pokemon.types.length > 1 ? 's' : ''}
+                                    <button class="edit-btn" onclick="openEditModal(${index}, 'types')">Edit</button>
+                                </h3>
+                                <div class="types-container">
+                                    ${pokemon.types.map(type => `
+                                        <span class="type-badge" style="background: ${getTypeColor(type)}">
+                                            ${type}
+                                        </span>
+                                    `).join('')}
+                                </div>
+                            </div>
+
+                            <div class="detail-section">
+                                <h3>Ability
+                                    <button class="edit-btn" onclick="openEditModal(${index}, 'ability')">Edit</button>
+                                </h3>
+                                <div>${pokemon.ability || 'No ability selected'}</div>
+                            </div>
+
+                            <div class="detail-section">
+                                <h3>Held Item
+                                    <button class="edit-btn" onclick="openEditModal(${index}, 'item')">Edit</button>
+                                </h3>
+                                <div>${pokemon.item || 'No item'}</div>
+                            </div>
+
+                            <div class="detail-section">
+                                <h3>Moveset (${pokemon.selectedMoves.filter(m => m).length}/4)
+                                    <button class="edit-btn" onclick="openEditModal(${index}, 'moves')">Edit</button>
+                                </h3>
+                                <div class="moves-grid">
+                                    ${pokemon.selectedMoves.map((move, i) => `
+                                        <div class="move-item">
+                                            ${move || `Move ${i + 1}`}
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 20px; display: flex; gap: 10px;">
+                        <button onclick="openEditModal(${index}, 'all')" style="flex: 1; padding: 10px; background: #444; color: white; border: none; border-radius: 8px; cursor: pointer;">
+                            ✏️ Edit Details
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Fetch all Pokémon on load
+        async function fetchAllPokemon() {
+            try {
+                const response = await fetch(`${window.location.origin}/pokemon?search=`);
+                allPokemon = await response.json();
+                console.log(`Loaded ${allPokemon.length} Pokémon`);
+            } catch (error) {
+                console.error('Error fetching Pokémon:', error);
+            }
+        }
+
+        // Choose a slot then scroll to search
+        function openPokemonSelector(slotIndex) {
+            targetSlotForAdd = slotIndex;
+            document.getElementById('pokemonSearch').focus();
+            document.getElementById('pokemonSearch').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            showToast(`Select a Pokémon for slot ${slotIndex + 1}`, 'info');
+        }
+
+        // Search Pokémon (uses backend filtering to avoid stale data)
+        async function searchPokemon() {
+            const searchInput = document.getElementById('pokemonSearch').value.trim().toLowerCase();
+            const resultsContainer = document.getElementById('searchResults');
+
+            if (!searchInput) {
+                resultsContainer.innerHTML = '<div style="color: #888; text-align: center; padding: 30px;">Enter a Pokémon name or type to search</div>';
+                return;
+            }
+
+            try {
+                // Fetch filtered results from backend
+                const response = await fetch(`${window.location.origin}/pokemon?search=${encodeURIComponent(searchInput)}`);
+                const data = await response.json();
+
+                // Fallback to local cache if backend returns empty
+                searchResults = (Array.isArray(data) && data.length ? data : allPokemon).filter(pokemon =>
+                    pokemon.name.toLowerCase().includes(searchInput) ||
+                    (pokemon.types || []).some(type => type.toLowerCase().includes(searchInput))
+                ).slice(0, 30);
+
+                if (searchResults.length === 0) {
+                    resultsContainer.innerHTML = '<div style="color: crimson; text-align: center; padding: 30px;">No Pokémon found</div>';
+                    return;
+                }
+
+                resultsContainer.innerHTML = searchResults.map(pokemon => `
+                    <div class="search-result-item" onclick="addToTeam(${pokemon.id})">
+                        <div style="font-size: 20px; font-weight: bold; margin-bottom: 10px; color: #ffd84d;">
+                            ${pokemon.name}
+                        </div>
+                        <div style="display: flex; gap: 8px; justify-content: center; margin-bottom: 15px;">
+                            ${(pokemon.types || []).map(type => `
+                                <span class="type-badge" style="background: ${getTypeColor(type)}; padding: 4px 10px; font-size: 11px;">
+                                    ${type}
+                                </span>
+                            `).join('')}
+                        </div>
+                        <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.id}.png"
+                             alt="${pokemon.name}"
+                             style="width: 120px; height: 120px; image-rendering: pixelated;"
+                             onerror="this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/0.png'">
+                        <div style="margin-top: 10px; font-size: 12px; color: #aaa;">
+                            ID: ${pokemon.id}
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error searching Pokémon:', error);
+                resultsContainer.innerHTML = '<div style="color: crimson;">Error fetching Pokémon</div>';
+            }
+        }
+
+        // Add Pokémon to team
+        async function addToTeam(pokemonId, slotIndex = null) {
+            const chosenSlot = slotIndex !== null ? slotIndex : (targetSlotForAdd !== null ? targetSlotForAdd : currentTeam.findIndex(slot => slot === null));
+
+            if (chosenSlot === -1) {
+                showToast('Your team is full! Remove a Pokémon first.', 'warning');
+                return;
+            }
+
+            if (currentTeam[chosenSlot]) {
+                const confirmReplace = confirm(`Replace ${currentTeam[chosenSlot].name} in slot ${chosenSlot + 1}?`);
+                if (!confirmReplace) return;
+            }
+
+            try {
+                // Check if Pokémon is already in team
+                const alreadyInTeam = currentTeam.some(p => p && p.id === pokemonId);
+                if (alreadyInTeam) {
+                    showToast('This Pokémon is already in your team!', 'warning');
+                    return;
+                }
+
+                const response = await fetch(`${window.location.origin}/pokemon/${pokemonId}`);
+                const pokemonData = await response.json();
+
+                if (pokemonData.error) {
+                    showToast('Pokémon not found!', 'error');
+                    return;
+                }
+
+                // Create enhanced Pokémon object
+                const teamPokemon = new TeamPokemon(pokemonData);
+
+                // Set default ability if available
+                if (teamPokemon.abilities.length > 0) {
+                    teamPokemon.ability = teamPokemon.abilities[0];
+                }
+
+                // Set default moves (first 4 available moves)
+                const availableMoves = teamPokemon.moves.map(m => m.name);
+                teamPokemon.selectedMoves = availableMoves.slice(0, 4);
+
+                currentTeam[chosenSlot] = teamPokemon;
+                initTeamSlots();
+                updateTeamStats();
+
+                targetSlotForAdd = null;
+
+                // Clear search
+                document.getElementById('pokemonSearch').value = '';
+                document.getElementById('searchResults').innerHTML =
+                    '<div style="color: #888; text-align: center; padding: 30px;">Search for more Pokémon...</div>';
+
+            } catch (error) {
+                console.error('Error adding Pokémon to team:', error);
+                showToast('Error adding Pokémon to team', 'error');
+            }
+        }
+
+        // Open edit modal
+        function openEditModal(slotIndex, section = 'all') {
+            const pokemon = currentTeam[slotIndex];
+            if (!pokemon) return;
+
+            currentEditSlot = slotIndex;
+
+            let modalHTML = `
+                <h2 style="color: #ffd84d; margin-bottom: 20px;">Editing ${pokemon.name}</h2>
+                <div style="display: flex; gap: 20px; margin-bottom: 30px;">
+                    <div style="flex: 1; text-align: center;">
+                        <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pokemon.id}.png"
+                             alt="${pokemon.name}" style="width: 200px; height: 200px;">
+                    </div>
+                    <div style="flex: 2;">
+            `;
+
+            if (section === 'all' || section === 'basics') {
+                modalHTML += `
+                    <div style="margin-bottom: 20px;">
+                        <h3 style="color: #ffd84d;">Level & Nature</h3>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 10px;">
+                            <div>
+                                <label>Level:</label>
+                                <input type="number" id="editLevel" value="${pokemon.level}" min="1" max="100"
+                                       style="width: 100%; padding: 8px; border-radius: 5px; background: rgba(255,255,255,0.1); color: white; border: 1px solid #555;">
+                            </div>
+                            <div>
+                                <label>Nature:</label>
+                                <select id="editNature" style="width: 100%; padding: 8px; border-radius: 5px; background: rgba(255,255,255,0.1); color: white; border: 1px solid #555;">
+                                    ${natures.map(nature => `
+                                        <option value="${nature}" ${nature === pokemon.nature ? 'selected' : ''}>${nature}</option>
+                                    `).join('')}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            if (section === 'all' || section === 'ability') {
+                modalHTML += `
+                    <div style="margin-bottom: 20px;">
+                        <h3 style="color: #ffd84d;">Ability</h3>
+                        <select id="editAbility" style="width: 100%; padding: 10px; border-radius: 8px; background: rgba(255,255,255,0.1); color: white; border: 1px solid #555; margin-top: 10px;">
+                            ${pokemon.abilities.map(ability => `
+                                <option value="${ability}" ${ability === pokemon.ability ? 'selected' : ''}>${ability}</option>
+                            `).join('')}
+                        </select>
+                    </div>
+                `;
+            }
+
+            if (section === 'all' || section === 'item') {
+                modalHTML += `
+                    <div style="margin-bottom: 20px;">
+                        <h3 style="color: #ffd84d;">Held Item</h3>
+                        <select id="editItem" style="width: 100%; padding: 10px; border-radius: 8px; background: rgba(255,255,255,0.1); color: white; border: 1px solid #555; margin-top: 10px;">
+                            <option value="">No Item</option>
+                            ${commonItems.map(item => `
+                                <option value="${item}" ${item === pokemon.item ? 'selected' : ''}>${item}</option>
+                            `).join('')}
+                        </select>
+                    </div>
+                `;
+            }
+
+            if (section === 'all' || section === 'moves') {
+                modalHTML += `
+                    <div style="margin-bottom: 20px;">
+                        <h3 style="color: #ffd84d;">Moveset</h3>
+                        <div style="display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 10px;">
+                            ${[1, 2, 3, 4].map(i => `
+                                <div style="display: flex; gap: 10px; align-items: center;">
+                                    <label style="min-width: 60px;">Move ${i}:</label>
+                                    <select id="editMove${i}" style="flex: 1; padding: 8px; border-radius: 5px; background: rgba(255,255,255,0.1); color: white; border: 1px solid #555;">
+                                        <option value="">-- Select Move --</option>
+                                        ${pokemon.moves.map(move => `
+                                            <option value="${move.name}" ${move.name === pokemon.selectedMoves[i-1] ? 'selected' : ''}>
+                                                ${move.name} (${move.type}/${move.category}/${move.power || '--'})
+                                            </option>
+                                        `).join('')}
+                                    </select>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            if (section === 'all') {
+                modalHTML += `
+                    <div class="stat-editor">
+                        <h3>💪 Effort Values (EVs)</h3>
+                        <p style="font-size: 12px; color: #aaa; margin-bottom: 10px;">Max 510 total • 252 per stat</p>
+                        <div class="stat-grid">
+                            <div class="stat-input-group">
+                                <label>HP</label>
+                                <input type="number" id="editEVHP" value="${pokemon.evs.hp || 0}" min="0" max="252" oninput="updateEVTracker()">
+                            </div>
+                            <div class="stat-input-group">
+                                <label>ATK</label>
+                                <input type="number" id="editEVATK" value="${pokemon.evs.attack || 0}" min="0" max="252" oninput="updateEVTracker()">
+                            </div>
+                            <div class="stat-input-group">
+                                <label>DEF</label>
+                                <input type="number" id="editEVDEF" value="${pokemon.evs.defence || 0}" min="0" max="252" oninput="updateEVTracker()">
+                            </div>
+                            <div class="stat-input-group">
+                                <label>SP.ATK</label>
+                                <input type="number" id="editEVSPA" value="${pokemon.evs.sp_atk || 0}" min="0" max="252" oninput="updateEVTracker()">
+                            </div>
+                            <div class="stat-input-group">
+                                <label>SP.DEF</label>
+                                <input type="number" id="editEVSPD" value="${pokemon.evs.sp_def || 0}" min="0" max="252" oninput="updateEVTracker()">
+                            </div>
+                            <div class="stat-input-group">
+                                <label>SPD</label>
+                                <input type="number" id="editEVSPE" value="${pokemon.evs.spd || 0}" min="0" max="252" oninput="updateEVTracker()">
+                            </div>
+                        </div>
+                        <div class="ev-tracker">
+                            <div class="ev-tracker-bar">
+                                <div class="ev-tracker-fill" id="evTracker" style="width: 0%;">
+                                </div>
+                            </div>
+                            <div class="ev-tracker-text" id="evTrackerText">0 / 510</div>
+                        </div>
+                    </div>
+
+                    <div class="stat-editor">
+                        <h3>🎯 Individual Values (IVs)</h3>
+                        <p style="font-size: 12px; color: #aaa; margin-bottom: 10px;">Default: 31 each (max stat)</p>
+                        <div class="stat-grid">
+                            <div class="stat-input-group">
+                                <label>HP</label>
+                                <input type="number" id="editIVHP" value="${pokemon.ivs.hp || 31}" min="0" max="31">
+                            </div>
+                            <div class="stat-input-group">
+                                <label>ATK</label>
+                                <input type="number" id="editIVATK" value="${pokemon.ivs.attack || 31}" min="0" max="31">
+                            </div>
+                            <div class="stat-input-group">
+                                <label>DEF</label>
+                                <input type="number" id="editIVDEF" value="${pokemon.ivs.defence || 31}" min="0" max="31">
+                            </div>
+                            <div class="stat-input-group">
+                                <label>SP.ATK</label>
+                                <input type="number" id="editIVSPA" value="${pokemon.ivs.sp_atk || 31}" min="0" max="31">
+                            </div>
+                            <div class="stat-input-group">
+                                <label>SP.DEF</label>
+                                <input type="number" id="editIVSPD" value="${pokemon.ivs.sp_def || 31}" min="0" max="31">
+                            </div>
+                            <div class="stat-input-group">
+                                <label>SPD</label>
+                                <input type="number" id="editIVSPE" value="${pokemon.ivs.spd || 31}" min="0" max="31">
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            modalHTML += `
+                    </div>
+                </div>
+                <div style="text-align: center; margin-top: 30px;">
+                    <button onclick="savePokemonEdits()" style="padding: 12px 40px; background: linear-gradient(135deg, #ffd84d 0%, #ff9900 100%); color: black; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; margin-right: 10px;">
+                        💾 Save Changes
+                    </button>
+                    <button onclick="closeModal()" style="padding: 12px 40px; background: #666; color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: bold;">
+                        Cancel
+                    </button>
+                </div>
+            `;
+
+            document.getElementById('modalContent').innerHTML = modalHTML;
+            document.getElementById('editModal').style.display = 'block';
+            
+            // Update EV tracker on load
+            if (section === 'all') {
+                updateEVTracker();
+            }
+        }
+
+        // Update EV Tracker visual feedback
+        function updateEVTracker() {
+            const evHP = parseInt(document.getElementById('editEVHP')?.value) || 0;
+            const evATK = parseInt(document.getElementById('editEVATK')?.value) || 0;
+            const evDEF = parseInt(document.getElementById('editEVDEF')?.value) || 0;
+            const evSPA = parseInt(document.getElementById('editEVSPA')?.value) || 0;
+            const evSPD = parseInt(document.getElementById('editEVSPD')?.value) || 0;
+            const evSPE = parseInt(document.getElementById('editEVSPE')?.value) || 0;
+
+            const totalEV = evHP + evATK + evDEF + evSPA + evSPD + evSPE;
+            const maxEV = 510;
+            const percentage = Math.min((totalEV / maxEV) * 100, 100);
+
+            const tracker = document.getElementById('evTracker');
+            const text = document.getElementById('evTrackerText');
+
+            if (tracker && text) {
+                tracker.style.width = percentage + '%';
+                tracker.textContent = totalEV > 0 ? totalEV : '';
+                
+                // Change color if exceeding limit
+                if (totalEV > maxEV) {
+                    tracker.classList.add('warning');
+                    text.style.color = '#f44336';
+                    text.textContent = `${totalEV} / ${maxEV} ⚠️ EXCEEDS LIMIT`;
+                } else if (totalEV > 490) {
+                    tracker.classList.add('warning');
+                    text.textContent = `${totalEV} / ${maxEV}`;
+                } else {
+                    tracker.classList.remove('warning');
+                    text.style.color = '#ffd84d';
+                    text.textContent = `${totalEV} / ${maxEV}`;
+                }
+            }
+        }
+
+        // Save Pokémon edits
+        function savePokemonEdits() {
+            if (currentEditSlot === null) return;
+
+            const pokemon = currentTeam[currentEditSlot];
+
+            // Update basic info
+            pokemon.level = parseInt(document.getElementById('editLevel')?.value) || 50;
+            pokemon.nature = document.getElementById('editNature')?.value || 'Hardy';
+            pokemon.ability = document.getElementById('editAbility')?.value || '';
+            pokemon.item = document.getElementById('editItem')?.value || '';
+
+            // Update moves
+            pokemon.selectedMoves = [
+                document.getElementById('editMove1')?.value || '',
+                document.getElementById('editMove2')?.value || '',
+                document.getElementById('editMove3')?.value || '',
+                document.getElementById('editMove4')?.value || ''
+            ];
+
+            // Update EVs
+            const evHP = parseInt(document.getElementById('editEVHP')?.value) || 0;
+            const evATK = parseInt(document.getElementById('editEVATK')?.value) || 0;
+            const evDEF = parseInt(document.getElementById('editEVDEF')?.value) || 0;
+            const evSPA = parseInt(document.getElementById('editEVSPA')?.value) || 0;
+            const evSPD = parseInt(document.getElementById('editEVSPD')?.value) || 0;
+            const evSPE = parseInt(document.getElementById('editEVSPE')?.value) || 0;
+
+            const totalEV = evHP + evATK + evDEF + evSPA + evSPD + evSPE;
+            if (totalEV > 510) {
+                showToast('EV total exceeds 510! Please adjust.', 'warning');
+                return;
+            }
+
+            pokemon.evs = {
+                hp: evHP,
+                attack: evATK,
+                defence: evDEF,
+                sp_atk: evSPA,
+                sp_def: evSPD,
+                spd: evSPE
+            };
+
+            // Update IVs
+            pokemon.ivs = {
+                hp: parseInt(document.getElementById('editIVHP')?.value) || 31,
+                attack: parseInt(document.getElementById('editIVATK')?.value) || 31,
+                defence: parseInt(document.getElementById('editIVDEF')?.value) || 31,
+                sp_atk: parseInt(document.getElementById('editIVSPA')?.value) || 31,
+                sp_def: parseInt(document.getElementById('editIVSPD')?.value) || 31,
+                spd: parseInt(document.getElementById('editIVSPE')?.value) || 31
+            };
+
+            // Close modal and refresh
+            closeModal();
+            initTeamSlots();
+            showToast(`✓ ${pokemon.name} updated!`, 'success');
+        }
+
+        // Close modal
+        function closeModal() {
+            document.getElementById('editModal').style.display = 'none';
+            currentEditSlot = null;
+        }
+
+        // Remove Pokémon from team
+        function removeFromTeam(slotIndex) {
+            if (confirm(`Remove ${currentTeam[slotIndex].name} from your team?`)) {
+                currentTeam[slotIndex] = null;
+                initTeamSlots();
+            }
+        }
+
+        // Update team statistics
+        function updateTeamStats() {
+            const teamStats = document.getElementById('teamStats');
+            const typeCoverage = document.getElementById('typeCoverage');
+
+            const teamPokemon = currentTeam.filter(p => p);
+
+            if (teamPokemon.length === 0) {
+                teamStats.innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #888;">
+                        Add Pokémon to your team to see statistics
+                    </div>
+                `;
+                typeCoverage.innerHTML = '<div style="color: #888;">No types coverage yet</div>';
+                return;
+            }
+
+            // Calculate average stats
+            const totalStats = {
+                hp: 0, attack: 0, sp_atk: 0,
+                defence: 0, sp_def: 0, spd: 0
+            };
+
+            let typeSet = new Set();
+            let allMoves = new Set();
+
+            teamPokemon.forEach(pokemon => {
+                if (pokemon.stats) {
+                    Object.keys(totalStats).forEach(stat => {
+                        totalStats[stat] += pokemon.stats[stat] || 0;
+                    });
+                }
+                if (pokemon.types) {
+                    pokemon.types.forEach(type => typeSet.add(type));
+                }
+                if (pokemon.selectedMoves) {
+                    pokemon.selectedMoves.filter(m => m).forEach(move => allMoves.add(move));
+                }
+            });
+
+            const count = teamPokemon.length;
+            const averageStats = {};
+            Object.keys(totalStats).forEach(stat => {
+                averageStats[stat] = Math.round(totalStats[stat] / count);
+            });
+
+            // Display average stats
+            teamStats.innerHTML = Object.entries(averageStats).map(([stat, value]) => `
+                <div class="stat-item">
+                    <div class="stat-name">${stat.toUpperCase().replace('_', ' ')}</div>
+                    <div class="stat-value">${value}</div>
+                </div>
+            `).join('');
+
+            // Display type coverage
+            typeCoverage.innerHTML = Array.from(typeSet).map(type => `
+                <div class="type-coverage-item" style="background: ${getTypeColor(type)}">
+                    <span>${type}</span>
+                </div>
+            `).join('');
+
+            // Add moves count
+            if (allMoves.size > 0) {
+                typeCoverage.innerHTML += `
+                    <div style="grid-column: 1 / -1; margin-top: 20px; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 10px;">
+                        <div style="color: #ffd84d; margin-bottom: 10px;">Total Unique Moves: ${allMoves.size}</div>
+                        <div style="font-size: 12px; color: #aaa; max-height: 100px; overflow-y: auto;">
+                            ${Array.from(allMoves).join(', ')}
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        // Type color mapping
+        function getTypeColor(type) {
+            const colors = {
+                'Normal': '#A8A878',
+                'Fire': '#F08030',
+                'Water': '#6890F0',
+                'Grass': '#78C850',
+                'Electric': '#F8D030',
+                'Ice': '#98D8D8',
+                'Fighting': '#C03028',
+                'Poison': '#A040A0',
+                'Ground': '#E0C068',
+                'Flying': '#A890F0',
+                'Psychic': '#F85888',
+                'Bug': '#A8B820',
+                'Rock': '#B8A038',
+                'Ghost': '#705898',
+                'Dark': '#705848',
+                'Dragon': '#7038F8',
+                'Steel': '#B8B8D0',
+                'Fairy': '#EE99AC'
+            };
+            return colors[type] || '#777';
+        }
+
+        // Save team with custom name
+        function saveTeam() {
+            const teamCount = currentTeam.filter(p => p).length;
+            if (teamCount === 0) {
+                showToast('Your team is empty! Add some Pokémon first.', 'warning');
+                return;
+            }
+
+            // Prompt for team name
+            const teamName = prompt('Enter a name for this team:', `Team ${new Date().toLocaleDateString()}`);
+            if (!teamName || teamName.trim() === '') {
+                showToast('Team name is required.', 'warning');
+                return;
+            }
+
+            // Create a simplified version for database storage
+            const teamToSave = currentTeam.map(pokemon => {
+                if (!pokemon) return null;
+                return {
+                    id: pokemon.id,
+                    name: pokemon.name,
+                    level: pokemon.level,
+                    ability: pokemon.ability,
+                    item: pokemon.item,
+                    selectedMoves: pokemon.selectedMoves,
+                    nature: pokemon.nature,
+                    evs: pokemon.evs || { hp: 0, attack: 0, defence: 0, sp_atk: 0, sp_def: 0, spd: 0 },
+                    ivs: pokemon.ivs || { hp: 31, attack: 31, defence: 31, sp_atk: 31, sp_def: 31, spd: 31 },
+                    gender: pokemon.gender || 'N',
+                    shiny: pokemon.shiny || false
+                };
+            });
+
+            // Save to localStorage for local persistence
+            localStorage.setItem('pokemonTeam', JSON.stringify(teamToSave));
+
+            // Also save to backend database
+            const accessToken = localStorage.getItem('accessToken');
+            if (!accessToken) {
+                showToast('Not logged in! Team saved locally only.', 'warning');
+                return;
+            }
+
+            authFetch(`${window.location.origin}/team/save`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    teamName: teamName.trim(),
+                    format: 'VGC',
+                    teamData: teamToSave
+                })
+            })
+            .then(async res => {
+                if (!res) throw new Error('Session expired');
+                const body = await res.json().catch(() => ({}));
+                if (!res.ok) {
+                    const msg = body.error || `HTTP ${res.status}`;
+                    throw new Error(msg);
+                }
+                return body;
+            })
+            .then(data => {
+                if (data.success) {
+                    showToast(`✓ Team "${teamName}" saved! (${teamCount} Pokémon)`, 'success');
+                    loadTeamsListUI(); // Refresh teams list
+                } else {
+                    showToast(`Error: ${data.error || 'Unknown error'}`, 'error');
+                }
+            })
+            .catch(err => {
+                console.error('Save error:', err);
+                showToast(`Error saving to database: ${err.message}`, 'error');
+                if ((err.message || '').toLowerCase().includes('session')) {
+                    logout();
+                }
+            });
+        }
+
+        // Load team from saved list
+        async function loadTeamFromName(teamName) {
+            const accessToken = localStorage.getItem('accessToken');
+            if (!accessToken) {
+                showToast('Not logged in!', 'error');
+                return;
+            }
+
+            try {
+                const response = await authFetch(`${window.location.origin}/team/load`);
+                if (!response) throw new Error('Session expired');
+                const data = await response.json();
+                
+                if (data.team && data.team.length > 0) {
+                    // Load team from backend
+                    for (let i = 0; i < data.team.length; i++) {
+                        const savedPokemon = data.team[i];
+                        if (savedPokemon) {
+                            const pokemonData = {
+                                id: savedPokemon.id,
+                                name: savedPokemon.name,
+                                types: savedPokemon.types,
+                                abilities: savedPokemon.abilities,
+                                moves: [],
+                                stats: savedPokemon.stats
+                            };
+                            
+                            const movesResponse = await fetch(`${window.location.origin}/pokemon/${savedPokemon.id}/moves`);
+                            const movesData = await movesResponse.json();
+                            pokemonData.moves = movesData;
+                            
+                            const teamPokemon = new TeamPokemon(pokemonData);
+                            teamPokemon.level = savedPokemon.level || 50;
+                            teamPokemon.ability = savedPokemon.ability || teamPokemon.abilities[0];
+                            teamPokemon.item = savedPokemon.item || '';
+                            teamPokemon.selectedMoves = savedPokemon.selectedMoves || ['', '', '', ''];
+                            teamPokemon.nature = savedPokemon.nature || 'Hardy';
+                            teamPokemon.gender = savedPokemon.gender || 'N';
+                            teamPokemon.shiny = savedPokemon.shiny || false;
+                            teamPokemon.evs = savedPokemon.evs || { hp: 0, attack: 0, defence: 0, sp_atk: 0, sp_def: 0, spd: 0 };
+                            teamPokemon.ivs = savedPokemon.ivs || { hp: 31, attack: 31, defence: 31, sp_atk: 31, sp_def: 31, spd: 31 };
+                            
+                            currentTeam[i] = teamPokemon;
+                        }
+                    }
+                    initTeamSlots();
+                    showToast(`✓ Team loaded!`, 'success');
+                }
+            } catch (error) {
+                console.error('Error loading team:', error);
+                showToast(`Error loading team: ${error.message}`, 'error');
+                if ((error.message || '').toLowerCase().includes('session')) {
+                    logout();
+                }
+            }
+        }
+
+        // Load and display teams list UI
+        async function loadTeamsListUI() {
+            const accessToken = localStorage.getItem('accessToken');
+            if (!accessToken) {
+                document.getElementById('savedTeamsList').innerHTML = '<div style="color: #aaa; text-align: center; padding: 20px;">Log in to view saved teams</div>';
+                return;
+            }
+
+            try {
+                const response = await authFetch(`${window.location.origin}/team/list`);
+                if (!response) {
+                    document.getElementById('savedTeamsList').innerHTML = '<div style="color: crimson; text-align: center; padding: 20px;">Session expired. Please log in again.</div>';
+                    logout();
+                    return;
+                }
+                
+                if (!response.ok) {
+                    document.getElementById('savedTeamsList').innerHTML = '<div style="color: #aaa; text-align: center; padding: 20px;">No saved teams yet</div>';
+                    return;
+                }
+
+                const data = await response.json();
+                
+                if (!data.teams || data.teams.length === 0) {
+                    document.getElementById('savedTeamsList').innerHTML = '<div style="color: #aaa; text-align: center; padding: 20px;">No saved teams yet</div>';
+                    return;
+                }
+
+                const teamsHTML = data.teams.map((team, index) => `
+                    <div style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 10px; margin-bottom: 10px; border-left: 4px solid #ffd84d;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <div style="color: #ffd84d; font-weight: bold; margin-bottom: 5px;">${team.team_name}</div>
+                                <div style="font-size: 12px; color: #aaa;">Created: ${new Date(team.created_at).toLocaleDateString()}</div>
+                            </div>
+                            <div style="display: flex; gap: 10px;">
+                                <button onclick="loadTeamByName('${team.team_name}')" style="padding: 8px 16px; background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%); color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">
+                                    📥 Load
+                                </button>
+                                <button onclick="deleteTeam('${team.team_name}')" style="padding: 8px 16px; background: linear-gradient(135deg, #f44336 0%, #da190b 100%); color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">
+                                    🗑️ Delete
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+
+                document.getElementById('savedTeamsList').innerHTML = teamsHTML;
+            } catch (error) {
+                console.error('Error loading teams list:', error);
+                if ((error.message || '').toLowerCase().includes('session')) {
+                    logout();
+                    return;
+                }
+                document.getElementById('savedTeamsList').innerHTML = '<div style="color: crimson; text-align: center; padding: 20px;">Error loading teams</div>';
+            }
+        }
+
+        // Delete team
+        async function deleteTeam(teamName) {
+            if (!confirm(`Delete team "${teamName}"? This cannot be undone.`)) {
+                return;
+            }
+
+            const accessToken = localStorage.getItem('accessToken');
+            if (!accessToken) {
+                showToast('Not logged in!', 'error');
+                return;
+            }
+
+            try {
+                const response = await authFetch(`${window.location.origin}/team/delete`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ teamName })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    showToast(`✓ Team deleted!`, 'success');
+                    loadTeamsListUI(); // Refresh teams list
+                } else {
+                    showToast(`Error: ${data.error}`, 'error');
+                }
+            } catch (error) {
+                console.error('Error deleting team:', error);
+                showToast(`Error deleting team: ${error.message}`, 'error');
+                if ((error.message || '').toLowerCase().includes('session')) {
+                    logout();
+                }
+            }
+        }
+
+        // Load team by name (helper function for button clicks)
+        function loadTeamByName(teamName) {
+            loadTeamFromName(teamName);
+        }
+
+        // Clear team
+        function clearTeam() {
+            if (currentTeam.filter(p => p).length === 0) {
+                showToast('Your team is already empty!', 'warning');
+                return;
+            }
+
+            if (confirm('Clear your entire team? This cannot be undone.')) {
+                currentTeam = Array(6).fill(null);
+                initTeamSlots();
+            }
+        }
+
+        // View Pokémon details
+        function viewPokemonDetails(pokemonId) {
+            window.open(`pokemon-details.html?id=${pokemonId}`, '_blank');
+        }
+
+        // Load saved team from backend database (or localStorage fallback)
+        async function loadSavedTeam() {
+            const accessToken = localStorage.getItem('accessToken');
+            
+            // Try to load from backend database first
+            if (accessToken) {
+                try {
+                    const response = await authFetch(`${window.location.origin}/team/load`);
+                    if (!response) throw new Error('Session expired');
+                    const data = await response.json();
+                    
+                    if (data.team && data.team.length > 0) {
+                        // Load team from backend
+                        for (let i = 0; i < data.team.length; i++) {
+                            const savedPokemon = data.team[i];
+                            if (savedPokemon) {
+                                try {
+                                    const pokemonData = {
+                                        id: savedPokemon.id,
+                                        name: savedPokemon.name,
+                                        types: savedPokemon.types,
+                                        abilities: savedPokemon.abilities,
+                                        moves: [], // Moves will be populated separately
+                                        stats: savedPokemon.stats
+                                    };
+                                
+                                    // Get moves for this pokemon from backend
+                                    const movesResponse = await fetch(`${window.location.origin}/pokemon/${savedPokemon.id}/moves`);
+                                    const movesData = await movesResponse.json();
+                                    pokemonData.moves = movesData;
+                                
+                                    const teamPokemon = new TeamPokemon(pokemonData);
+                                
+                                    // Restore all saved settings from database
+                                    teamPokemon.level = savedPokemon.level || 50;
+                                    teamPokemon.ability = savedPokemon.ability || teamPokemon.abilities[0];
+                                    teamPokemon.item = savedPokemon.item || '';
+                                    teamPokemon.selectedMoves = savedPokemon.selectedMoves || ['', '', '', ''];
+                                    teamPokemon.nature = savedPokemon.nature || 'Hardy';
+                                    teamPokemon.gender = savedPokemon.gender || 'N';
+                                    teamPokemon.shiny = savedPokemon.shiny || false;
+                                    teamPokemon.evs = savedPokemon.evs || { hp: 0, attack: 0, defence: 0, sp_atk: 0, sp_def: 0, spd: 0 };
+                                    teamPokemon.ivs = savedPokemon.ivs || { hp: 31, attack: 31, defence: 31, sp_atk: 31, sp_def: 31, spd: 31 };
+                                
+                                    currentTeam[i] = teamPokemon;
+                                } catch (error) {
+                                    console.error('Error restoring Pokémon from backend:', error);
+                                }
+                            }
+                        }
+                        initTeamSlots();
+                        return; // Successfully loaded from backend
+                    }
+                } catch (error) {
+                    console.error('Error loading team from backend:', error);
+                    if ((error.message || '').toLowerCase().includes('session')) {
+                        logout();
+                        return;
+                    }
+                    // Fall back to localStorage
+                }
+            }
+            
+            // Fallback: Load from localStorage if backend failed or user not logged in
+            const savedTeam = localStorage.getItem('pokemonTeam');
+            if (savedTeam) {
+                try {
+                    const parsedTeam = JSON.parse(savedTeam);
+                    // We need to fetch full data for each Pokémon
+                    for (let index = 0; index < parsedTeam.length; index++) {
+                        const savedPokemon = parsedTeam[index];
+                        if (savedPokemon) {
+                            try {
+                                const response = await fetch(`${window.location.origin}/pokemon/${savedPokemon.id}`);
+                                const pokemonData = await response.json();
+
+                                if (!pokemonData.error) {
+                                    const teamPokemon = new TeamPokemon(pokemonData);
+                                    // Restore saved settings
+                                    teamPokemon.level = savedPokemon.level || 50;
+                                    teamPokemon.ability = savedPokemon.ability || teamPokemon.abilities[0];
+                                    teamPokemon.item = savedPokemon.item || '';
+                                    teamPokemon.selectedMoves = savedPokemon.selectedMoves || ['', '', '', ''];
+                                    teamPokemon.nature = savedPokemon.nature || 'Hardy';
+                                    teamPokemon.evs = savedPokemon.evs || { hp: 0, attack: 0, defence: 0, sp_atk: 0, sp_def: 0, spd: 0 };
+                                    teamPokemon.ivs = savedPokemon.ivs || { hp: 31, attack: 31, defence: 31, sp_atk: 31, sp_def: 31, spd: 31 };
+
+                                    currentTeam[index] = teamPokemon;
+                                }
+                            } catch (error) {
+                                console.error('Error loading saved Pokémon:', error);
+                            }
+                        }
+                    }
+                    initTeamSlots();
+                } catch (e) {
+                    console.error('Error loading saved team:', e);
+                }
+            }
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check login - redirect if not logged in
+            const isLoggedIn = localStorage.getItem('accessToken');
+            if (!isLoggedIn) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            fetchAllPokemon();
+            loadSavedTeam();
+            initTeamSlots();
+            loadTeamsListUI(); // Load saved teams list
+
+            // Add keyboard shortcut for search
+            document.getElementById('pokemonSearch').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    searchPokemon();
+                }
+            });
+        });
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('editModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        };
+    </script>
+</body>
+</html>

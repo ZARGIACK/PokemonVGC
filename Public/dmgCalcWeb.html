@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Damage Calculator</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<aside class="sidebar">
+  <h2 class="logo">Menu</h2>
+  <a href="homepage.html">Dashboard</a>
+  <a href="pokedex.html">Pokédex</a>
+  <a href="dmgCalcWeb.html">Calculator</a>
+  <a href="team-builder.html">Team Builder</a>
+  <a href="map.html">Map Viewer</a>
+  <a href="gymTracker.html">Gym Tracker</a>
+</aside>
+<main class="main">
+  <div class="container">
+    <h1>Pokemon Damage Calculator</h1>
+    <form id="dmg-form">
+      <div class="form-group">
+        <label for="attacker">Attacking Pokémon Name</label>
+        <input id="attacker" name="attacker" placeholder="Charizard" required>
+      </div>
+      <div class="form-group">
+        <label for="attacker_level">Attacking Pokémon Level</label>
+        <input id="attacker_level" name="attacker_level" type="number" value="50">
+      </div>
+      <div class="form-group">
+        <label for="move">Move Used</label>
+        <input id="move" name="move" placeholder="Flamethrower" required>
+      </div>
+      <div class="divider"></div>
+      <div class="form-group">
+        <label for="defender">Defending Pokémon Name</label>
+        <input id="defender" name="defender" placeholder="Venusaur" required>
+      </div>
+      <button type="submit" class="calc-btn">Calculate Damage</button>
+    </form>
+
+    <div class="result-box" id="result-box">
+      <h3>Damage Output</h3>
+      <p id="result-text">Damage will be displayed here</p>
+    </div>
+  </div>
+</main>
+<script>
+document.getElementById('dmg-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const attacker = document.getElementById('attacker').value.trim();
+  const defender = document.getElementById('defender').value.trim();
+  const attacker_level = document.getElementById('attacker_level').value;
+  const move = document.getElementById('move').value.trim();
+
+  const resBox = document.getElementById('result-text');
+  resBox.textContent = 'Calculating...';
+
+  try {
+    const res = await fetch(`${window.location.origin}/api/dmgcalc`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ attacker, defender, attacker_level, move })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Error');
+    resBox.innerHTML = `<strong>Damage Dealt: ${data.damage}</strong><div style="margin-top:8px;color:#666">Base: ${data.details.base_damage}, STAB: ${data.details.stab}, Type x: ${data.details.type_multiplier}</div>`;
+  } catch (err) {
+    resBox.textContent = err.message || 'Request failed';
+  }
+});
+</script>
+</body>
+</html>

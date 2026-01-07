@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Pokémon Gym & Elite Four Tracker</title>
+    
+    <link rel="stylesheet" href="css/style.css">
+    
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: "Trebuchet MS", Arial, sans-serif;
+            background: linear-gradient(to bottom, #ff1a1a, #ffffff);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 40px auto;
+            background: rgba(255,255,255,0.92);
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+            overflow: hidden;
+            padding-bottom: 40px;
+            margin-left: 240px;
+        }
+
+        h1, h2 {
+            text-align: center;
+            color: white;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 { background: #000; }
+        h2 { background: #8b0000; border-radius: 10px; margin: 0 30px 20px; }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            padding: 20px 30px;
+            background: #f8f8f8;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .control-group {
+            max-width: 400px;
+            width: 100%;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #222;
+        }
+
+        select, input[type="date"] {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: 2px solid #ccc;
+            font-size: 1rem;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #ff1a1a;
+            box-shadow: 0 0 0 3px rgba(255,26,26,0.2);
+        }
+
+        .table-container {
+            padding: 0 30px 30px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 40px;
+        }
+
+        th, td {
+            padding: 14px 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background: #6f42c1;
+            color: white;
+            font-weight: bold;
+        }
+
+        tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+
+        .progress-bar {
+            height: 20px;
+            background: #330000;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid #660000;
+        }
+
+        .progress-fill {
+            height: 100%;
+            transition: width 0.6s ease;
+        }
+
+        .progress-fill.not-started  { background: #e9ecef; }
+        .progress-fill.in-progress  { background: linear-gradient(to right, #fd7e14, #e06c00); }
+        .progress-fill.complete     { background: linear-gradient(to right, #66ff99, #28a745); }
+
+        .status-cell {
+            position: relative;
+            min-width: 220px;
+            padding: 8px 12px;
+        }
+
+        .status-text {
+            font-weight: bold;
+            display: inline-block;
+            min-width: 120px;
+            text-align: center;
+        }
+
+        .not-started  { color: #6c757d; }
+        .in-progress  { color: #fd7e14; }
+        .completed    { color: #28a745; }
+
+        .action-buttons {
+            margin-top: 6px;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        button {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            color: white;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+
+        .start-btn    { background: #007bff; }
+        .start-btn:hover    { background: #0069d9; }
+        .complete-btn { background: #28a745; }
+        .complete-btn:hover { background: #218838; }
+
+        .no-data {
+            text-align: center;
+            padding: 40px;
+            color: #777;
+            font-style: italic;
+            font-size: 1.1rem;
+        }
+    </style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <h2 class="logo">Menu</h2>
+  <a href="homepage.html">Dashboard</a>
+  <a href="pokedex.html">Pokédex</a>
+  <a href="dmgCalcWeb.html">Calculator</a>
+  <a href="map.html">Map Viewer</a>
+  <a href="gymTracker.html">Gym Tracker</a>
+    <a href="team-builder.html">Team Builder</a>
+    <a href="admin.html">Admin</a>
+</aside>
+
+<div class="container">
+    <h1>Gym & Elite Four Tracker</h1>
+
+    <div class="controls">
+        <div class="control-group">
+            <label for="regionSelect">Region <span style="color:#dc3545;">*</span></label>
+            <select id="regionSelect" required>
+                <!-- Filled dynamically -->
+            </select>
+        </div>
+    </div>
+
+    <!-- GYMS TABLE -->
+    <div class="table-container">
+        <h2>Gym Progression</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Gym Name</th>
+                    <th>Leader</th>
+                    <th>Duration</th>
+                    <th>Joined</th>
+                    <th>Finished</th>
+                    <th>Progress</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody id="gymTableBody"></tbody>
+        </table>
+    </div>
+
+    <!-- ELITE FOUR TABLE -->
+    <div class="elite-container">
+        <h2>Elite Four Challenge</h2>
+        <div class="table-container">
+            <table id="eliteTable">
+                <thead>
+                    <tr>
+                        <th>Elite Four Member</th>
+                        <th>Duration</th>
+                        <th>Joined</th>
+                        <th>Finished</th>
+                        <th>Progress</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="eliteTableBody"></tbody>
+            </table>
+        </div>
+    </div>
+ </div>
+
+<script src="js/auth.js"></script>
+<script>
+const API_BASE = window.location.origin;
+
+let allGyms = [];
+let allEliteFour = [];
+let userProgress = {};
+let eliteProgress = {};
+
+const regionSelect = document.getElementById('regionSelect');
+const gymTableBody = document.getElementById('gymTableBody');
+const eliteTableBody = document.getElementById('eliteTableBody');
+
+// Admin detection via logged-in user role; optional ?admin=1 fallback for UI
+const urlParams = new URLSearchParams(window.location.search);
+const currentUser = (typeof getCurrentUser === 'function') ? getCurrentUser() : null;
+const isAdmin = (currentUser && currentUser.role === 'admin') || urlParams.get('admin') === '1';
+
+function formatYYYYMMDDToGB(dateVal) {
+    if (!dateVal) return '-';
+    const s = typeof dateVal === 'string' ? dateVal : '';
+    const ymd = s.includes('T') ? s.split('T')[0] : s;
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(ymd)) return '-';
+    const [y, m, d] = ymd.split('-');
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    return `${d} ${months[parseInt(m) - 1]} ${y}`;
+}
+
+window.addEventListener('load', async () => {
+    // Require login
+    if (typeof isLoggedIn === 'function' && !isLoggedIn()) {
+        window.location.href = 'login.html';
+        return;
+    }
+    await loadRegions();
+    await loadGyms();
+    await loadEliteFourMembers();
+    await loadUserProgress();
+    await loadEliteProgress();
+
+    if (regionSelect.options.length > 0) {
+        regionSelect.value = regionSelect.options[0].value;
+    }
+
+    renderTable();
+    renderEliteFourTable();
+});
+
+regionSelect.addEventListener('change', () => {
+    renderTable();
+    renderEliteFourTable();
+});
+
+async function loadRegions() {
+    try {
+        const res = await fetch(`${API_BASE}/api/regions`);
+        const regions = await res.json();
+        regions.forEach(r => {
+            const opt = document.createElement('option');
+            opt.value = r.region;
+            opt.textContent = r.region;
+            regionSelect.appendChild(opt);
+        });
+    } catch (e) {
+        console.error('Failed to load regions', e);
+    }
+}
+
+async function loadGyms() {
+    try {
+        const res = await fetch(`${API_BASE}/api/gyms`);
+        allGyms = await res.json();
+    } catch (e) {
+        console.error('Failed to load gyms', e);
+    }
+}
+
+async function loadEliteFourMembers() {
+    try {
+        const res = await fetch(`${API_BASE}/api/elite-four`);
+        allEliteFour = await res.json();
+    } catch (e) {
+        console.error('Failed to load elite four', e);
+    }
+}
+
+async function loadUserProgress() {
+    try {
+        const res = await authFetch(`${API_BASE}/api/user-progress`);
+        const progress = await res.json();
+        userProgress = {};
+        progress.forEach(p => {
+            userProgress[p.gym_id] = {
+                start_date: p.start_date,
+                end_date: p.end_date,
+                duration_days: p.duration_days
+            };
+        });
+        renderTable();
+        renderEliteFourTable();
+    } catch (e) {
+        console.error('Failed to load user progress', e);
+    }
+}
+
+async function loadEliteProgress() {
+    try {
+        const res = await authFetch(`${API_BASE}/api/user-elite-progress`);
+        const progress = await res.json();
+        eliteProgress = {};
+        progress.forEach(p => {
+            eliteProgress[p.region] = {
+                start_date: p.start_date,
+                end_date: p.end_date,
+                duration_days: p.duration_days
+            };
+        });
+        renderEliteFourTable();
+    } catch (e) {
+        console.error('Failed to load elite progress', e);
+    }
+}
+
+function renderTable() {
+    const selectedRegion = regionSelect.value;
+    const tbody = gymTableBody;
+
+    tbody.innerHTML = '';
+
+    if (!selectedRegion) {
+        tbody.innerHTML = `<tr><td colspan="7" class="no-data">Please select a region</td></tr>`;
+        return;
+    }
+
+    let filtered = allGyms.filter(g => g.region === selectedRegion);
+    filtered.sort((a,b) => a.gym_number - b.gym_number);
+
+    if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="no-data">No gyms in this region</td></tr>`;
+        return;
+    }
+
+    let previousCompleted = true;
+
+    filtered.forEach(gym => {
+        const prog = userProgress[gym.id] || {};
+        const hasStarted = !!prog.start_date;
+        const isCompleted = !!prog.end_date;
+
+        const duration = isCompleted && prog.duration_days 
+            ? `${prog.duration_days} days` 
+            : (hasStarted ? 'In progress' : '-');
+
+            const start = prog.start_date && prog.start_date !== '0000-00-00'
+                ? formatYYYYMMDDToGB(prog.start_date) : '-';
+
+            const end = prog.end_date && prog.end_date !== '0000-00-00'
+                ? formatYYYYMMDDToGB(prog.end_date) : '-';
+
+        const canStart = previousCompleted || gym.gym_number === 1;
+        const canComplete = hasStarted && !isCompleted;
+
+        let statusText = 'Not Started';
+        let statusClass = 'not-started';
+        if (hasStarted && !isCompleted) {
+            statusText = 'In Progress';
+            statusClass = 'in-progress';
+        } else if (isCompleted) {
+            statusText = 'Completed';
+            statusClass = 'completed';
+        }
+
+        const progressClass = isCompleted ? 'complete' : (hasStarted ? 'in-progress' : 'not-started');
+        const progressWidth = isCompleted ? '100%' : (hasStarted ? '45%' : '0%');
+
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${gym.gym_name}</td>
+            <td>${gym.leader}</td>
+            <td>${duration}</td>
+            <td>${start}</td>
+            <td>${end}</td>
+            <td>
+                <div class="progress-bar">
+                    <div class="progress-fill ${progressClass}" style="width: ${progressWidth}"></div>
+                </div>
+            </td>
+            <td class="status-cell">
+                <span class="status-text ${statusClass}">${statusText}</span>
+                <div class="action-buttons">
+                    ${!hasStarted && canStart ? `
+                        <button class="start-btn" onclick="startGym(${gym.id})">
+                            Start Gym
+                        </button>
+                    ` : ''}
+                    ${canComplete ? `
+                        <button class="complete-btn" onclick="markAsCompleted(${gym.id})">
+                            Mark Complete
+                        </button>
+                    ` : ''}
+                    ${isAdmin && isCompleted ? `
+                        <button class="complete-btn" style="background:#6c757d" onclick="fixGymDate(${gym.id})">
+                            Fix Date
+                        </button>
+                    ` : ''}
+                </div>
+            </td>
+        `;
+        tbody.appendChild(row);
+
+        previousCompleted = isCompleted;
+    });
+}
+
+function renderEliteFourTable() {
+    const selectedRegion = regionSelect.value;
+    const tbody = eliteTableBody;
+
+    tbody.innerHTML = '';
+
+    if (!selectedRegion) {
+        tbody.innerHTML = `<tr><td colspan="6" class="no-data">Select a region to view Elite Four</td></tr>`;
+        return;
+    }
+
+    const members = allEliteFour.filter(m => m.region === selectedRegion);
+    if (members.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="no-data">No Elite Four data for this region</td></tr>`;
+        return;
+    }
+
+    const prog = eliteProgress[selectedRegion] || {};
+    const hasStarted = !!prog.start_date;
+    const isCompleted = !!prog.end_date;
+
+    const duration = isCompleted && prog.duration_days 
+        ? `${prog.duration_days} days` 
+        : (hasStarted ? 'In progress' : '-');
+
+    const start = prog.start_date && prog.start_date !== '0000-00-00'
+        ? formatYYYYMMDDToGB(prog.start_date) : '-';
+
+    const end = prog.end_date && prog.end_date !== '0000-00-00'
+        ? formatYYYYMMDDToGB(prog.end_date) : '-';
+
+    const gymsInRegion = allGyms.filter(g => g.region === selectedRegion);
+    const completedGymsCount = gymsInRegion.filter(g => userProgress[g.id]?.end_date).length;
+    const canStartElite = gymsInRegion.length >= 8 && completedGymsCount === 8;
+
+    const progressClass = isCompleted ? 'complete' : (hasStarted ? 'in-progress' : 'not-started');
+    const progressWidth = isCompleted ? '100%' : (hasStarted ? '45%' : '0%');
+
+    let statusText = 'Not Attempted';
+    let statusClass = 'not-started';
+    if (hasStarted && !isCompleted) {
+        statusText = 'Challenging';
+        statusClass = 'in-progress';
+    } else if (isCompleted) {
+        statusText = 'Defeated';
+        statusClass = 'completed';
+    }
+
+    members.forEach(member => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${member.name}</td>
+            <td>${duration}</td>
+            <td>${start}</td>
+            <td>${end}</td>
+            <td>
+                <div class="progress-bar">
+                    <div class="progress-fill ${progressClass}" style="width:${progressWidth}"></div>
+                </div>
+            </td>
+            <td class="status-cell">
+                <span class="status-text ${statusClass}">${statusText}</span>
+                <div class="action-buttons">
+                    ${!hasStarted && canStartElite ? `
+                        <button class="start-btn" onclick="startEliteFour('${selectedRegion}')">
+                            Challenge Elite Four
+                        </button>
+                    ` : ''}
+                    ${hasStarted && !isCompleted ? `
+                        <button class="complete-btn" onclick="completeEliteFour('${selectedRegion}')">
+                            Defeat Elite Four
+                        </button>
+                    ` : ''}
+                    ${isAdmin && isCompleted ? `
+                        <button class="complete-btn" style="background:#6c757d" onclick="fixEliteDate('${selectedRegion}')">
+                            Fix Date
+                        </button>
+                    ` : ''}
+                </div>
+            </td>
+        `;
+        tbody.appendChild(row);
+    });
+}
+
+async function startGym(gymId) {
+    if (!confirm("Start this gym now?")) return;
+
+    try {
+        const res = await authFetch(`${API_BASE}/api/start-gym`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ gym_id: gymId })
+        });
+
+        if (res.ok) {
+            await loadUserProgress();
+        } else {
+            const data = await res.json();
+            alert(data.error || "Couldn't start gym");
+        }
+    } catch (e) {
+        alert("Error connecting to server");
+    }
+}
+
+async function markAsCompleted(gymId) {
+    if (!confirm("Mark this gym as completed today?")) return;
+
+    try {
+        // Get user's local date (YYYY-MM-DD)
+        const today = new Date();
+        const yyyy = today.getFullYear();
+        const mm = String(today.getMonth() + 1).padStart(2, '0');
+        const dd = String(today.getDate()).padStart(2, '0');
+        const endDate = `${yyyy}-${mm}-${dd}`;
+
+        const res = await authFetch(`${API_BASE}/api/mark-gym-complete`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ gym_id: gymId, end_date: endDate })
+        });
+
+        if (res.ok) {
+            await loadUserProgress();
+        } else {
+            const data = await res.json();
+            alert(`Failed: ${data.error || 'Unknown error'}`);
+        }
+    } catch (e) {
+        alert("Connection error");
+    }
+}
+
+async function startEliteFour(region) {
+    if (!confirm(`Start challenging the Elite Four of ${region}?`)) return;
+
+    try {
+        const res = await authFetch(`${API_BASE}/api/start-elite-four`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ region })
+        });
+
+        if (res.ok) {
+            await loadEliteProgress();
+        } else {
+            const data = await res.json();
+            alert(data.error || "Couldn't start Elite Four challenge");
+        }
+    } catch (e) {
+        alert("Connection error");
+    }
+}
+
+async function completeEliteFour(region) {
+    if (!confirm(`Defeat the entire Elite Four of ${region} today?`)) return;
+
+    try {
+        // Get user's local date (YYYY-MM-DD)
+        const today = new Date();
+        const yyyy = today.getFullYear();
+        const mm = String(today.getMonth() + 1).padStart(2, '0');
+        const dd = String(today.getDate()).padStart(2, '0');
+        const endDate = `${yyyy}-${mm}-${dd}`;
+
+        const res = await authFetch(`${API_BASE}/api/complete-elite-four`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ region, end_date: endDate })
+        });
+
+        if (res.ok) {
+            await loadEliteProgress();
+        } else {
+            alert("Failed to mark Elite Four as defeated");
+        }
+    } catch (e) {
+        alert("Connection error");
+    }
+}
+
+async function fixGymDate(gymId) {
+    if (!isAdmin) return;
+    if (!confirm("Fix this gym's completion date to today?")) return;
+    try {
+        // Get user's local date (YYYY-MM-DD)
+        const today = new Date();
+        const yyyy = today.getFullYear();
+        const mm = String(today.getMonth() + 1).padStart(2, '0');
+        const dd = String(today.getDate()).padStart(2, '0');
+        const endDate = `${yyyy}-${mm}-${dd}`;
+
+        const res = await authFetch(`${API_BASE}/api/admin/fix-gym-end-date`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ gym_id: gymId, end_date: endDate })
+        });
+        if (res.ok) {
+            await loadUserProgress();
+        } else {
+            const data = await res.json();
+            alert(data.error || 'Failed to fix date');
+        }
+    } catch (e) {
+        alert('Connection error');
+    }
+}
+
+async function fixEliteDate(region) {
+    if (!isAdmin) return;
+    if (!confirm(`Fix Elite Four completion date for ${region} to today?`)) return;
+    try {
+        // Get user's local date (YYYY-MM-DD)
+        const today = new Date();
+        const yyyy = today.getFullYear();
+        const mm = String(today.getMonth() + 1).padStart(2, '0');
+        const dd = String(today.getDate()).padStart(2, '0');
+        const endDate = `${yyyy}-${mm}-${dd}`;
+
+        const res = await authFetch(`${API_BASE}/api/admin/fix-elite-end-date`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ region, end_date: endDate })
+        });
+        if (res.ok) {
+            await loadEliteProgress();
+        } else {
+            const data = await res.json();
+            alert(data.error || 'Failed to fix date');
+        }
+    } catch (e) {
+        alert('Connection error');
+    }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Poké Dashboard</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <h2 class="logo">Menu</h2>
+    <a href="pokedex.html">Pokédex Browser</a>
+    <a href="dmgCalcWeb.html">Damage Calculator</a>
+    <a href="map.html">Map Viewer</a>
+    <a href="gymTracker.html">Gym Tracker</a>
+    <a href="team-builder.html">Team Builder</a>
+    <a href="admin.html">Admin</a>
+    <a href="login.html" id="authLink">Login</a>
+  </aside>
+
+  <!-- Main -->
+  <main class="main">
+    <header class="topbar">
+      <h1>Dashboard</h1>
+      <div class="user">Username</div>
+    </header>
+
+    <section class="cards">
+      <div class="card light">
+        <h2>User Information Summary</h2>
+        <div style="margin-top: 15px; font-size: 16px; line-height: 1.8;">
+          <p><strong>Name:</strong> <span id="userName">-</span></p>
+          <p><strong>Email:</strong> <span id="userEmail">-</span></p>
+          <p><strong>Role:</strong> <span id="userRole" style="text-transform: capitalize;">-</span></p>
+        </div>
+      </div>
+
+      <div class="card dark">
+        <h2>Favourite <span>Pokémon</span></h2>
+        <div id="favoritesList" class="favorites-grid"></div>
+      </div>
+    </section>
+
+    <!-- Search -->
+    <section class="search">
+      <input type="text" id="pokeInput" placeholder="Search Pokémon (e.g. Pikachu)">
+      <button onclick="searchPokemon()">PokéSearch</button>
+      <div id="results" class="results"></div>
+    </section>
+  </main>
+
+  <script src="js/auth.js"></script>
+  <script src="js/script.js"></script>
+  <script>
+    // Display username if logged in
+    window.addEventListener('DOMContentLoaded', () => {
+      const user = getCurrentUser();
+      const authLink = document.getElementById('authLink');
+      
+      if (user && user.name) {
+        document.querySelector('.user').textContent = user.name;
+        // Populate user info card
+        document.getElementById('userName').textContent = user.name || '-';
+        document.getElementById('userEmail').textContent = user.email || '-';
+        document.getElementById('userRole').textContent = user.role || '-';
+        // Change login link to logout
+        authLink.textContent = 'Logout';
+        authLink.href = '#';
+        authLink.addEventListener('click', (e) => {
+          e.preventDefault();
+          logout();
+        });
+      }
+
+      // Add Enter key trigger for search
+      document.getElementById('pokeInput').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          searchPokemon();
+        }
+      });
+    });
+  </script>
+</body>
+</html>

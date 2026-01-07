@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Login - VGC</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<aside class="sidebar">
+  <h2 class="logo">Menu</h2>
+  <a href="homepage.html">Dashboard</a>
+  <a href="pokedex.html">Pokédex</a>
+  <a href="dmgCalcWeb.html">Calculator</a>
+  <a href="team-builder.html">Team Builder</a>
+</aside>
+
+<main class="main">
+  <header class="topbar">
+    <h1>Login / Register</h1>
+  </header>
+
+  <div class="container">
+    <div id="errorMsg" style="color:red;font-weight:bold;margin-bottom:12px;"></div>
+    <div id="successMsg" style="color:green;font-weight:bold;margin-bottom:12px;"></div>
+
+    <!-- Login Form -->
+    <div id="loginForm">
+      <h2>Login</h2>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="loginEmail" placeholder="user@example.com">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="loginPassword" placeholder="Password">
+      </div>
+      <button class="calc-btn" id="loginBtn">Login</button>
+      <p style="margin-top:12px;">Don't have an account? <a href="#" id="showRegister">Register here</a></p>
+    </div>
+
+    <!-- Register Form (hidden by default) -->
+    <div id="registerForm" style="display:none;">
+      <h2>Register</h2>
+      <div class="form-group">
+        <label>Name</label>
+        <input type="text" id="registerName" placeholder="Your Name">
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="registerEmail" placeholder="user@example.com">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="registerPassword" placeholder="Min 8 characters">
+      </div>
+      <button class="calc-btn" id="registerBtn">Register</button>
+      <p style="margin-top:12px;">Already have an account? <a href="#" id="showLogin">Login here</a></p>
+    </div>
+  </div>
+</main>
+
+<script src="js/auth.js"></script>
+</body>
+</html>

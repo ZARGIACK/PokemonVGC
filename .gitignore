@@ -1,0 +1,6 @@
+node_modules/
+.env
+.next/
+dist/
+build/
+check_types.js

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Pokédex</title>
+
+  <!-- Correct CSS path -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<aside class="sidebar">
+  <h2 class="logo">Menu</h2>
+  <a href="homepage.html">Dashboard</a>
+  <a href="pokedex.html">Pokédex</a>
+  <a href="dmgCalcWeb.html">Calculator</a>
+  <a href="map.html">Map Viewer</a>
+  <a href="gymTracker.html">Gym Tracker</a>
+  <a href="team-builder.html">Team Builder</a>
+  <a href="admin.html">Admin</a>
+</aside>
+
+<div class="main">
+  <!-- Search & Filters -->
+  <section class="filters">
+    <input
+      type="text"
+      id="searchInput"
+      placeholder="Search Pokémon..."
+    >
+    <button id="searchBtn" style="padding:10px 20px;background:#ffd84d;border:none;border-radius:5px;cursor:pointer;font-weight:bold;">Search</button>
+
+    <select id="typeFilter" onchange="loadPokemon()">
+      <option value="">All Types</option>
+    </select>
+  </section>
+
+  <!-- Pokédex Results -->
+  <section id="pokedex" class="pokedex-grid"></section>
+</div>
+
+<!-- Correct JS path -->
+<script src="js/pokedex.js"></script>
+</body>
+</html>

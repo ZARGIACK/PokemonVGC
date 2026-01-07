@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    .container { 
+      margin-left: 220px; 
+      padding: 30px 40px;
+      max-width: 1400px;
+    }
+    
+    h1 {
+      color: #333;
+      margin-bottom: 10px;
+    }
+    
+    p {
+      color: #666;
+      margin-bottom: 30px;
+    }
+    
+    table { 
+      width: 100%; 
+      border-collapse: collapse; 
+      margin-top: 20px;
+      background: white;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    th, td { 
+      padding: 16px 20px; 
+      border-bottom: 1px solid #f0f0f0; 
+      text-align: left; 
+    }
+    
+    th { 
+      background: #6f42c1; 
+      color: #fff;
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 0.85rem;
+      letter-spacing: 0.5px;
+    }
+    
+    tbody tr:hover {
+      background: #f8f9fa;
+    }
+    
+    .role-badge { 
+      padding: 4px 12px; 
+      border-radius: 12px; 
+      color: #fff; 
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      display: inline-block;
+    }
+    
+    .role-admin { background: #dc3545; }
+    .role-player { background: #28a745; }
+    
+    .action-btn { 
+      padding: 8px 16px; 
+      border: 0; 
+      border-radius: 6px; 
+      color: #fff; 
+      cursor: pointer; 
+      margin-right: 8px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      transition: all 0.2s ease;
+    }
+    
+    .action-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+    
+    .btn-promote { background: #007bff; }
+    .btn-promote:hover { background: #0056b3; }
+    .btn-demote { background: #6c757d; }
+    .btn-demote:hover { background: #545b62; }
+  </style>
+</head>
+<body>
+  <aside class="sidebar">
+    <h2 class="logo">Menu</h2>
+    <a href="homepage.html">Dashboard</a>
+    <a href="pokedex.html">Pokédex</a>
+    <a href="dmgCalcWeb.html">Calculator</a>
+    <a href="team-builder.html">Team Builder</a>
+    <a href="map.html">Map Viewer</a>
+    <a href="gymTracker.html">Gym Tracker</a>
+    <a href="admin.html">Admin</a>
+  </aside>
+
+  <div class="container">
+    <h1>Admin Dashboard</h1>
+    <p>Manage user roles.</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Role</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="usersBody"></tbody>
+    </table>
+  </div>
+
+  <script src="js/auth.js"></script>
+  <script>
+    const API_BASE = window.location.origin;
+    const usersBody = document.getElementById('usersBody');
+
+    window.addEventListener('load', async () => {
+      if (!isLoggedIn()) {
+        window.location.href = 'login.html';
+        return;
+      }
+      const user = getCurrentUser();
+      if (!user || user.role !== 'admin') {
+        alert('Forbidden: Admins only');
+        window.location.href = 'homepage.html';
+        return;
+      }
+
+      await loadUsers();
+    });
+
+    async function loadUsers() {
+      try {
+        const res = await authFetch(`${API_BASE}/api/admin/users`);
+        const users = await res.json();
+        usersBody.innerHTML = '';
+        users.forEach(u => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${u.id}</td>
+            <td>${u.name}</td>
+            <td>${u.email}</td>
+            <td>
+              <span class="role-badge ${u.role === 'admin' ? 'role-admin' : 'role-player'}">${u.role}</span>
+            </td>
+            <td>
+              <button class="action-btn btn-promote" onclick="setRole(${u.id}, 'admin')">Make Admin</button>
+              <button class="action-btn btn-demote" onclick="setRole(${u.id}, 'player')">Make Player</button>
+            </td>
+          `;
+          usersBody.appendChild(tr);
+        });
+      } catch (e) {
+        console.error('Load users failed', e);
+        alert('Failed to load users');
+      }
+    }
+
+    async function setRole(userId, role) {
+      if (!confirm(`Set user ${userId} role to ${role}?`)) return;
+      try {
+        const res = await authFetch(`${API_BASE}/api/admin/set-role`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ user_id: userId, role })
+        });
+        if (res.ok) {
+          await loadUsers();
+        } else {
+          const data = await res.json();
+          alert(data.error || 'Update failed');
+        }
+      } catch (e) {
+        console.error('Set role failed', e);
+        alert('Network error');
+      }
+    }
+  </script>
+</body>
+</html>
